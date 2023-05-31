@@ -2,30 +2,37 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"path/filepath"
 
+	"github.com/bnagoc/usegolangcourse/views"
 	"github.com/go-chi/chi/v5"
 )
 
+func executeTemplate(w http.ResponseWriter, filepath string) {
+	t, err := views.Parse(filepath)
+	if err != nil {
+		log.Printf("parsing template: %v", err)
+		http.Error(w, "There was an error parsing the template.", http.StatusInternalServerError)
+		return
+	}
+	t.Execute(w, nil)
+}
+
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, "<h1>Welcome to my awsome site!</h1>")
+	tplPath := filepath.Join("templates", "home.gohtml")
+	executeTemplate(w, tplPath)
 }
 
 func contactFunc(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, "<h1>Contact Page</h1><p>To get in touch, email me at <a href=\"mailto:uladzislau.samuseu@gmail.com\">uladzislau.samuseu@gmail.com</a>.")
+	tplPath := filepath.Join("templates", "contact.gohtml")
+	executeTemplate(w, tplPath)
 }
 
 func faqFunc(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, `<h1>FAQ Page</h1>
-	<ul>
-		<li><b>Is there a free version?</b> Yes! we offer a free trial for 30 days on any paid plans.</li>
-		<li><b>What are your support hours?</b> We have support staff answering emails 24/7, though responce times may be a bit slower on weekends.</li>
-		<li><b>How do I contact support?</b> Email us - <a href="mailto:uladzislau.samuseu@gmail.com">uladzislau.samuseu@gmail.com</a>.</li>
-	</ul>
-	`)
+	tplPath := filepath.Join("templates", "faq.gohtml")
+	executeTemplate(w, tplPath)
 }
 
 func main() {
